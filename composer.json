@@ -1,0 +1,32 @@
+{
+  "name": "brikdigital/craft-rich-variables",
+  "description": "Use Craft globals as variables in Rich Text fields",
+  "type": "craft-plugin",
+  "license": "mit",
+  "require": {
+    "php": ">=8.2",
+    "craftcms/cms": "^5.6.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "brikdigital\\craftrichvariables\\": "src/"
+    }
+  },
+  "extra": {
+    "handle": "ckeditor-rich-variables",
+    "name": "Rich variables",
+    "developer": "brikdigital",
+    "documentationUrl": "",
+    "class": "brikdigital\\craftrichvariables\\RichVariables"
+  },
+  "config": {
+    "sort-packages": true,
+    "platform": {
+      "php": "8.2"
+    },
+    "allow-plugins": {
+      "yiisoft/yii2-composer": true,
+      "craftcms/plugin-installer": true
+    }
+  }
+}
