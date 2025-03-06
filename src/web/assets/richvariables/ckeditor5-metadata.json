@@ -1,0 +1,17 @@
+{
+  "plugins": [
+    {
+      "name": "Rich variables",
+      "className": "RichVariables",
+      "description": "Adds text to the editor.",
+      "path": "src/richvariables.js",
+      "uiComponents": [
+        {
+          "name": "richVariables",
+          "type": "Button",
+          "iconPath": "theme/icons/ckeditor.svg"
+        }
+      ]
+    }
+  ]
+}
