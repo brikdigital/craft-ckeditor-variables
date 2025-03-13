@@ -22,7 +22,7 @@
 		"./src/*": "./src/*",
     "./package.json": "./package.json"
   },
-  "license": "MIT",
+  "license": "MPL-2.0",
   "engines": {
     "node": ">=18.0.0",
     "npm": ">=5.7.1"
