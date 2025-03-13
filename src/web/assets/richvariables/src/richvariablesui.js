@@ -38,7 +38,7 @@ export default class RichVariablesUI extends Plugin {
 function getMenuDefinition() {
 	const definition = [];
 
-	const globalSets = window.globalSets;
+	const globalSets = window.globalSets ?? [];
 	globalSets.forEach((globalSet) => {
 		const children = [];
 		globalSet.fields.forEach((field) => {

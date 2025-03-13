@@ -6,6 +6,7 @@ use brikdigital\craftrichvariables\web\assets\richvariables\RichVariablesAsset;
 use Craft;
 use craft\base\Plugin;
 use craft\ckeditor\Field;
+use craft\fields\PlainText;
 use craft\htmlfield\events\ModifyPurifierConfigEvent;
 use yii\base\Event;
 use yii\web\View;
@@ -20,6 +21,8 @@ use yii\web\View;
  */
 class RichVariables extends Plugin
 {
+    private array $supportedFieldTypes = [PlainText::class];
+
     public bool $hasCpSettings = true;
 
     public function init(): void
@@ -59,11 +62,13 @@ class RichVariables extends Plugin
             foreach ($globalSets as $globalSet) {
                 $fields = [];
                 foreach ($globalSet->getFieldLayout()->getCustomFields() as $field) {
-                    $fields[] = [
-                        'handle' => $field->handle,
-                        'name' => $field->name,
-                        'value' => $globalSet->getFieldValue($field->handle),
-                    ];
+                    if (in_array($field::class, $this->supportedFieldTypes)) {
+                        $fields[] = [
+                            'handle' => $field->getHandle(),
+                            'name' => $field->name,
+                            'value' => $globalSet->getFieldValue($field->getHandle()),
+                        ];
+                    }
                 }
 
                 $globals[] = [
@@ -73,9 +78,10 @@ class RichVariables extends Plugin
                 ];
             }
 
-            $js = 'window.globalSets = ' . json_encode($globals) . ';';
-
-            $app->view->registerJs($js, View::POS_HEAD);
+            if ($json = json_encode($globals)) {
+                $js = "window.globalSets = $json;";
+                $app->view->registerJs($js, View::POS_HEAD);
+            }
         }
     }
 }
