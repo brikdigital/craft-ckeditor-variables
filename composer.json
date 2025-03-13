@@ -2,7 +2,25 @@
   "name": "brikdigital/craft-rich-variables",
   "description": "Use Craft globals as variables in Rich Text fields",
   "type": "craft-plugin",
-  "license": "mit",
+  "version": "5.0.0",
+  "keywords": [
+    "craft",
+    "cms",
+    "craftcms",
+    "craft-plugin"
+  ],
+  "support": {
+    "issues": "https://github.com/brikdigital/craft-rich-variables/issues?state=open",
+    "source": "https://github.com/brikdigital/craft-rich-variables",
+    "rss": "https://github.com/brikdigital/craft-rich-variables/commits/v2.atom"
+  },
+  "license": "MPL-2.0",
+  "authors": [
+    {
+      "name": "Brik.digital",
+      "homepage": "https://brik.digital"
+    }
+  ],
   "require": {
     "php": ">=8.2",
     "craftcms/ckeditor": "^4.6",
