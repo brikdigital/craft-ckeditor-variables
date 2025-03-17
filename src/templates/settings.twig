@@ -1,0 +1,11 @@
+{% import "_includes/forms" as forms %}
+
+<div class="flex-fields">
+    {{ forms.selectizeField({
+        multi: true,
+        label: 'Available global sets'|t,
+        name: 'globals',
+        options: globals,
+        values: settings.globals
+    }) }}
+</div>

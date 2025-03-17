@@ -2,8 +2,10 @@
 
 namespace brikdigital\craftrichvariables;
 
+use brikdigital\craftrichvariables\models\Settings;
 use brikdigital\craftrichvariables\web\assets\richvariables\RichVariablesAsset;
 use Craft;
+use craft\base\Model;
 use craft\base\Plugin;
 use craft\ckeditor\Field;
 use craft\fields\PlainText;
@@ -54,34 +56,57 @@ class RichVariables extends Plugin
 
     private function registerGlobals(): void
     {
-        $app = Craft::$app;
-        if ($app->getRequest()->getIsCpRequest()) {
-            $globalSets = $app->getGlobals()->getAllSets();
+        if (!Craft::$app->getRequest()->getIsCpRequest())
+            return;
 
-            $globals = [];
-            foreach ($globalSets as $globalSet) {
-                $fields = [];
-                foreach ($globalSet->getFieldLayout()->getCustomFields() as $field) {
-                    if (in_array($field::class, $this->supportedFieldTypes)) {
-                        $fields[] = [
-                            'handle' => $field->getHandle(),
-                            'name' => $field->name,
-                            'value' => $globalSet->getFieldValue($field->getHandle()),
-                        ];
-                    }
+        $globals = [];
+        foreach ($this->getSettings()->globals as $handle) {
+            $globalSet = Craft::$app->getGlobals()->getSetByHandle($handle);
+            $fields = [];
+
+            foreach ($globalSet->getFieldLayout()->getCustomFields() as $field) {
+                if (in_array($field::class, $this->supportedFieldTypes)) {
+                    $fields[] = [
+                        'handle' => $field->getHandle(),
+                        'name' => $field->name,
+                        'value' => $globalSet->getFieldValue($field->getHandle()),
+                    ];
                 }
-
-                $globals[] = [
-                    'handle' => $globalSet->handle,
-                    'name' => $globalSet->name,
-                    'fields' => $fields
-                ];
             }
 
-            if ($json = json_encode($globals)) {
-                $js = "window.globalSets = $json;";
-                $app->view->registerJs($js, View::POS_HEAD);
-            }
+            $globals[] = [
+                'handle' => $globalSet->handle,
+                'name' => $globalSet->name,
+                'fields' => $fields
+            ];
         }
+
+        if ($json = json_encode($globals)) {
+            $js = "window.globalSets = $json;";
+            Craft::$app->view->registerJs($js, View::POS_HEAD);
+        }
+    }
+
+    protected function createSettingsModel(): ?Model
+    {
+        return new Settings();
+    }
+
+    protected function settingsHtml(): ?string
+    {
+        $globals = [];
+        foreach (Craft::$app->getGlobals()->getAllSets() as $globalSet) {
+            $globals[] = [
+                'label' => $globalSet->name,
+                'value' => $globalSet->handle
+            ];
+        }
+        return Craft::$app->getView()->renderTemplate(
+            'ckeditor-rich-variables/settings',
+            [
+                'globals' => $globals,
+                'settings' => $this->getSettings()
+            ]
+        );
     }
 }
