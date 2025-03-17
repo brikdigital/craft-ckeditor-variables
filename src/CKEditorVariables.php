@@ -1,9 +1,9 @@
 <?php
 
-namespace brikdigital\craftrichvariables;
+namespace brikdigital\craftckeditorvariables;
 
-use brikdigital\craftrichvariables\models\Settings;
-use brikdigital\craftrichvariables\web\assets\richvariables\RichVariablesAsset;
+use brikdigital\craftckeditorvariables\models\Settings;
+use brikdigital\craftckeditorvariables\web\assets\ckeditorvariables\CKEditorVariablesAsset;
 use Craft;
 use craft\base\Model;
 use craft\base\Plugin;
@@ -14,14 +14,14 @@ use yii\base\Event;
 use yii\web\View;
 
 /**
- * Rich variables plugin
+ * CKEditor variables plugin
  *
- * @method static RichVariables getInstance()
+ * @method static CKEditorVariables getInstance()
  * @author brikdigital
  * @copyright brikdigital
  * @license MIT
  */
-class RichVariables extends Plugin
+class CKEditorVariables extends Plugin
 {
     private array $supportedFieldTypes = [PlainText::class];
 
@@ -34,7 +34,7 @@ class RichVariables extends Plugin
         $this->attachEventHandlers();
         $this->registerGlobals();
 
-        \craft\ckeditor\Plugin::registerCkeditorPackage(RichVariablesAsset::class);
+        \craft\ckeditor\Plugin::registerCkeditorPackage(CKEditorVariablesAsset::class);
     }
 
     private function attachEventHandlers()
@@ -82,7 +82,7 @@ class RichVariables extends Plugin
         }
 
         if ($json = json_encode($globals)) {
-            $js = "window.globalSets = $json;";
+            $js = "window.availableGlobalSets = $json;";
             Craft::$app->view->registerJs($js, View::POS_HEAD);
         }
     }
@@ -102,7 +102,7 @@ class RichVariables extends Plugin
             ];
         }
         return Craft::$app->getView()->renderTemplate(
-            'ckeditor-rich-variables/settings',
+            'ckeditor-variables/settings',
             [
                 'globals' => $globals,
                 'settings' => $this->getSettings()

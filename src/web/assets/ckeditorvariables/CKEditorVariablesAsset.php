@@ -1,22 +1,22 @@
 <?php
 
-namespace brikdigital\craftrichvariables\web\assets\richvariables;
+namespace brikdigital\craftckeditorvariables\web\assets\ckeditorvariables;
 
 use craft\ckeditor\web\assets\BaseCkeditorPackageAsset;
 
-class RichVariablesAsset extends BaseCkeditorPackageAsset
+class CKEditorVariablesAsset extends BaseCkeditorPackageAsset
 {
     public $sourcePath = __DIR__ . '/build';
 
     public $js = [
-        'rich-variables.js',
+        'variables.js',
     ];
 
     public array $pluginNames = [
-        'RichVariables',
+        'CKEditorVariables',
     ];
 
     public array $toolbarItems = [
-        'richVariables',
+        'ckeditorVariables',
     ];
 }

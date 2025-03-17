@@ -1,13 +1,13 @@
 {
   "plugins": [
     {
-      "name": "Rich variables",
-      "className": "RichVariables",
+      "name": "CKEditor variables",
+      "className": "CKEditorVariables",
       "description": "Adds text to the editor.",
-      "path": "src/richvariables.js",
+      "path": "src/ckeditorvariables.js",
       "uiComponents": [
         {
-          "name": "richVariables",
+          "name": "ckeditorVariables",
           "type": "Button",
           "iconPath": "theme/icons/ckeditor.svg"
         }

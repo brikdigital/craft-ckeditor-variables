@@ -1,6 +1,6 @@
 {
-  "name": "brikdigital/craft-rich-variables",
-  "description": "Use Craft globals as variables in Rich Text fields",
+  "name": "brikdigital/craft-ckeditor-variables",
+  "description": "Use Craft globals as variables in CKEditor fields",
   "type": "craft-plugin",
   "version": "5.0.0",
   "keywords": [
@@ -10,9 +10,9 @@
     "craft-plugin"
   ],
   "support": {
-    "issues": "https://github.com/brikdigital/craft-rich-variables/issues?state=open",
-    "source": "https://github.com/brikdigital/craft-rich-variables",
-    "rss": "https://github.com/brikdigital/craft-rich-variables/commits/v2.atom"
+    "issues": "https://github.com/brikdigital/craft-ckeditor-variables/issues?state=open",
+    "source": "https://github.com/brikdigital/craft-ckeditor-variables",
+    "rss": "https://github.com/brikdigital/craft-ckeditor-variables/commits/v2.atom"
   },
   "license": "MPL-2.0",
   "authors": [
@@ -28,15 +28,15 @@
   },
   "autoload": {
     "psr-4": {
-      "brikdigital\\craftrichvariables\\": "src/"
+      "brikdigital\\craftckeditorvariables\\": "src/"
     }
   },
   "extra": {
-    "handle": "ckeditor-rich-variables",
-    "name": "Rich variables",
+    "handle": "ckeditor-variables",
+    "name": "CKEditor variables",
     "developer": "brikdigital",
     "documentationUrl": "",
-    "class": "brikdigital\\craftrichvariables\\RichVariables"
+    "class": "brikdigital\\craftckeditorvariables\\CKEditorVariables"
   },
   "config": {
     "sort-packages": true,

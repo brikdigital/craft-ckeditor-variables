@@ -1,6 +1,6 @@
 import ckeditor from './../theme/icons/ckeditor.svg';
 
-export { default as RichVariables } from './richvariables.js';
+export { default as CKEditorVariables } from './ckeditorvariables.js';
 
 export const icons = {
 	ckeditor

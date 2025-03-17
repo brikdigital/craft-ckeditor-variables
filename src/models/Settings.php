@@ -1,6 +1,6 @@
 <?php
 
-namespace brikdigital\craftrichvariables\models;
+namespace brikdigital\craftckeditorvariables\models;
 
 use craft\base\Model;
 

@@ -3,15 +3,15 @@ import { addMenuToDropdown, createDropdown } from "ckeditor5/src/ui.js";
 
 import ckeditor5Icon from '../theme/icons/ckeditor.svg';
 
-export default class RichVariablesUI extends Plugin {
+export default class CKEditorVariablesUI extends Plugin {
 	init() {
 		const editor = this.editor;
 
 		// Define toolbar item
-		editor.ui.componentFactory.add( 'richVariables', locale => {
+		editor.ui.componentFactory.add( 'ckeditorVariables', locale => {
 			const dropdownView = createDropdown( locale );
 			dropdownView.buttonView.set( {
-				label: 'Rich variables',
+				label: 'Variables',
 				icon: ckeditor5Icon,
 				tooltip: true,
 				withText: true
@@ -21,12 +21,12 @@ export default class RichVariablesUI extends Plugin {
 			addMenuToDropdown(dropdownView, editor.ui.view.body, getMenuDefinition());
 
 			// Disable the placeholder button when the command is disabled.
-			const command = editor.commands.get( 'richVariable' );
+			const command = editor.commands.get( 'ckeditorVariable' );
 			dropdownView.bind( 'isEnabled' ).to( command );
 
 			// Execute the command when the dropdown item is clicked (executed).
 			this.listenTo( dropdownView, 'execute', (evt) => {
-				editor.execute( 'richVariable', { identifier: evt.path[1].id, property: evt.source.id, label: evt.source.label } );
+				editor.execute( 'ckeditorVariable', { identifier: evt.path[1].id, property: evt.source.id, label: evt.source.label } );
 				editor.editing.view.focus();
 			} );
 
@@ -38,7 +38,7 @@ export default class RichVariablesUI extends Plugin {
 function getMenuDefinition() {
 	const definition = [];
 
-	const globalSets = window.globalSets ?? [];
+	const globalSets = window.availableGlobalSets ?? [];
 	globalSets.forEach((globalSet) => {
 		const children = [];
 		globalSet.fields.forEach((field) => {
