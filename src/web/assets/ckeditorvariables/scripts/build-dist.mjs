@@ -1,13 +1,11 @@
 #!/usr/bin/env node
 
 /**
- * @license Copyright (c) 2020-2024, CKSource Holding sp. z o.o. All rights reserved.
+ * @license Copyright (c) 2020-2026, CKSource Holding sp. z o.o. All rights reserved.
  * For licensing, see LICENSE.md.
  */
 
-/* eslint-env node */
-
-import { createRequire } from 'module';
+import { createRequire } from 'node:module';
 import upath from 'upath';
 import chalk from 'chalk';
 import { build } from '@ckeditor/ckeditor5-dev-build-tools';
@@ -17,6 +15,8 @@ function dist( path ) {
 }
 
 ( async () => {
+	const tsconfig = 'tsconfig.dist.ckeditor5.json';
+
 	/**
 	 * Step 1
 	 */
@@ -26,8 +26,9 @@ function dist( path ) {
 	const pkg = require( upath.resolve( process.cwd(), './package.json' ) );
 
 	await build( {
-		input: 'src/index.js',
+		input: 'src/index.ts',
 		output: dist( './index.js' ),
+		tsconfig: 'tsconfig.dist.json',
 		external: [
 			'ckeditor5',
 			'ckeditor5-premium-features',
@@ -38,6 +39,7 @@ function dist( path ) {
 		],
 		clean: true,
 		sourceMap: true,
+		declarations: true,
 		translations: '**/*.po'
 	} );
 
@@ -47,12 +49,12 @@ function dist( path ) {
 	console.log( chalk.cyan( '2/2: Generating browser build...' ) );
 
 	await build( {
-		input: 'src/index.js',
 		output: dist( 'browser/index.js' ),
+		tsconfig,
 		sourceMap: true,
 		minify: true,
 		browser: true,
-		name: 'CKRichVariables',
+		name: 'CKVariables',
 		external: [
 			'ckeditor5',
 			'ckeditor5-premium-features'

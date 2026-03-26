@@ -3,7 +3,7 @@
 namespace brikdigital\craftckeditorvariables;
 
 use brikdigital\craftckeditorvariables\models\Settings;
-use brikdigital\craftckeditorvariables\web\assets\ckeditorvariables\CKEditorVariablesAsset;
+use brikdigital\craftckeditorvariables\web\assets\ckeditor5variables\CKEditorVariablesAsset;
 use Craft;
 use craft\base\Model;
 use craft\base\Plugin;
@@ -34,7 +34,9 @@ class CKEditorVariables extends Plugin
         $this->attachEventHandlers();
         $this->registerGlobals();
 
-        \craft\ckeditor\Plugin::registerCkeditorPackage(CKEditorVariablesAsset::class);
+        Craft::$app->onInit(function() {
+            \craft\ckeditor\Plugin::registerCkeditorPackage(CKEditorVariablesAsset::class);
+        });
     }
 
     private function attachEventHandlers()

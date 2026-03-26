@@ -4,7 +4,7 @@
       "name": "CKEditor variables",
       "className": "CKEditorVariables",
       "description": "Adds text to the editor.",
-      "path": "src/ckeditorvariables.js",
+      "path": "src/variables.ts",
       "uiComponents": [
         {
           "name": "ckeditorVariables",

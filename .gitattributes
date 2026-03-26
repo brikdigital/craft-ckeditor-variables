@@ -1,5 +1,5 @@
 /.ddev/ export-ignore
 /src/web/assets/ckeditorvariables/** export-ignore
-/src/web/assets/ckeditorvariables/build/ -export-ignore
-/src/web/assets/ckeditorvariables/build/** -export-ignore
+/src/web/assets/ckeditorvariables/dist/ -export-ignore
+/src/web/assets/ckeditorvariables/dist/** -export-ignore
 /src/web/assets/ckeditorvariables/CKEditorVariablesAsset.php -export-ignore

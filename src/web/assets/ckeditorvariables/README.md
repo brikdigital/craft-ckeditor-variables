@@ -1,5 +1,5 @@
 @brikdigital/ckeditor5-variables
-=====================================
+================================
 
 This package was created by the [ckeditor5-package-generator](https://www.npmjs.com/package/ckeditor5-package-generator) package.
 
@@ -12,10 +12,9 @@ This package was created by the [ckeditor5-package-generator](https://www.npmjs.
   * [`lint`](#lint)
   * [`stylelint`](#stylelint)
   * [`build:dist`](#builddist)
-  * [`dll:build`](#dllbuild)
-  * [`dll:serve`](#dllserve)
   * [`translations:synchronize`](#translationssynchronize)
   * [`translations:validate`](#translationsvalidate)
+  * [`ts:build` and `ts:clear`](#tsbuild-and-tsclear)
 * [License](#license)
 
 ## Developing the package
@@ -26,7 +25,7 @@ To read about the CKEditor 5 Framework, visit the [CKEditor 5 Framework document
 
 NPM scripts are a convenient way to provide commands in a project. They are defined in the `package.json` file and shared with people contributing to the project. It ensures developers use the same command with the same options (flags).
 
-All the scripts can be executed by running `npm run <script>`. Pre and post commands with matching names will be run for those as well.
+All the scripts can be executed by running `pnpm run <script>`. Pre and post commands with matching names will be run for those as well.
 
 The following scripts are available in the package.
 
@@ -42,13 +41,13 @@ Examples:
 
 ```bash
 # Starts the server and open the browser.
-npm run start
+pnpm run start
 
 # Disable auto-opening the browser.
-npm run start -- --no-open
+pnpm run start --no-open
 
 # Create the editor with the interface in German.
-npm run start -- --language=de
+pnpm run start --language=de
 ```
 
 ### `test`
@@ -59,21 +58,21 @@ Examples:
 
 ```bash
 # Execute tests.
-npm run test
+pnpm run test
 
 # Generate code coverage report after each change in the sources.
-npm run test -- --coverage
+pnpm run test --coverage
 ```
 
 ### `lint`
 
-Runs ESLint, which analyzes the code (all `*.js` files) to quickly find problems.
+Runs ESLint, which analyzes the code (all `*.ts` files) to quickly find problems.
 
 Examples:
 
 ```bash
 # Execute eslint.
-npm run lint
+pnpm run lint
 ```
 
 ### `stylelint`
@@ -84,43 +83,18 @@ Examples:
 
 ```bash
 # Execute stylelint.
-npm run stylelint
+pnpm run stylelint
 ```
 
 ### `build:dist`
 
-Creates npm and browser builds of your plugin. These builds can be added to the editor following the [Configuring CKEditor 5 features](https://ckeditor.com/docs/ckeditor5/latest/getting-started/setup/configuration.html) guide.
+Creates npm and browser builds of your plugin. These builds can be added to the editor by following the [Configuring CKEditor 5 features](https://ckeditor.com/docs/ckeditor5/latest/getting-started/setup/configuration.html) guide.
 
 Examples:
 
 ```bash
 # Builds the `npm` and browser files thats are ready to publish.
 npm run build:dist
-```
-
-### `dll:build`
-
-Creates a DLL-compatible package build that can be loaded into an editor using [DLL builds](https://ckeditor.com/docs/ckeditor5/latest/builds/guides/development/dll-builds.html).
-
-Examples:
-
-```bash
-# Build the DLL file that is ready to publish.
-npm run dll:build
-
-# Build the DLL file and listen to changes in its sources.
-npm run dll:build -- --watch
-```
-
-### `dll:serve`
-
-Creates a simple HTTP server (without the live-reload mechanism) that allows verifying whether the DLL build of the package is compatible with the CKEditor 5 [DLL builds](https://ckeditor.com/docs/ckeditor5/latest/builds/guides/development/dll-builds.html).
-
-Examples:
-
-```bash
-# Starts the HTTP server and opens the browser.
-npm run dll:serve
 ```
 
 ### `translations:synchronize`
@@ -143,7 +117,7 @@ The task may end with an error if one of the following conditions is met:
 Examples:
 
 ```bash
-npm run translations:synchronize
+pnpm run translations:synchronize
 ```
 
 ### `translations:validate`
@@ -153,8 +127,12 @@ Peforms only validation steps as described in [`translations:synchronize`](#tran
 Examples:
 
 ```bash
-npm run translations:validate
+pnpm run translations:validate
 ```
+
+### `ts:build` and `ts:clear`
+
+These scripts compile TypeScript and remove the compiled files. They are used in the aforementioned life cycle scripts, and there is no need to call them manually.
 
 ## License
 
