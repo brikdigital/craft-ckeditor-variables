@@ -104,6 +104,14 @@ class CKEditorVariables extends Plugin
                     $entry->getFieldValue($f->handle)
                 );
 
+                $entryFields[] = [
+                    'entrySection' => $entry->section->handle,
+                    'entrySlug' => $entry->slug,
+                    'handle' => 'title',
+                    'name' => 'Titel',
+                    'value' => $entry->title,
+                ];
+
                 /** @var TextField|PlainText|CKEditorField $field */
                 foreach ($fields as $i => $field) {
                     $entryFields[] = [
