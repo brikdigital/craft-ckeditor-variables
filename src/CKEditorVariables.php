@@ -67,8 +67,8 @@ class CKEditorVariables extends Plugin
             function (TemplateEvent $event) {
                 if (Craft::$app->request->isCpRequest) return;
                 /** @var Entry $entry */
+                if (empty($event->variables['entry'])) return;
                 $entry = $event->variables['entry'];
-                if (empty($entry)) return;
 
                 $event->output = preg_replace_callback("/\[\[(?<type>\w+) \^_\^ (?<field>\w+)]]/", function ($matches) use ($entry) {
                     if ($entry->type->handle !== $matches['type']) return '';
