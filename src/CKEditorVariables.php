@@ -5,10 +5,15 @@ namespace brikdigital\craftckeditorvariables;
 use brikdigital\craftckeditorvariables\models\Settings;
 use brikdigital\craftckeditorvariables\web\assets\ckeditorvariables\CKEditorVariablesAsset;
 use Craft;
+use craft\base\FieldInterface;
 use craft\base\Model;
 use craft\base\Plugin;
-use craft\ckeditor\Field;
+use craft\ckeditor\Field as CKEditorField;
+use craft\fieldlayoutelements\BaseField;
+use craft\fieldlayoutelements\entries\EntryTitleField;
+use craft\fieldlayoutelements\TextField;
 use craft\fields\PlainText;
+use craft\helpers\ArrayHelper;
 use craft\htmlfield\events\ModifyPurifierConfigEvent;
 use yii\base\Event;
 use yii\web\View;
@@ -41,8 +46,8 @@ class CKEditorVariables extends Plugin
     {
         // Add data attributes to HTML purifier
         Event::on(
-            Field::class,
-            Field::EVENT_MODIFY_PURIFIER_CONFIG,
+            CKEditorField::class,
+            CKEditorField::EVENT_MODIFY_PURIFIER_CONFIG,
             function (ModifyPurifierConfigEvent $event) {
                 $dataAttributes = ['identifier', 'property', 'label'];
                 if ($def = $event->config->getDefinition('HTML', true)) {
@@ -81,8 +86,43 @@ class CKEditorVariables extends Plugin
             ];
         }
 
+        $entryFields = [];
+        preg_match("/entries\/(?<section>\w+)\/(?<elementId>\d+)-(?<slug>(?:[^\/]*)?)/", Craft::$app->request->pathInfo, $matches);
+        if (!empty($matches['slug'])) {
+            $entry = Craft::$app->entries->getEntryById($matches['elementId']);
+            $layout = $entry->getFieldLayout();
+            if ($layout !== null) {
+                $fields = collect($layout->getCustomFields())
+                    ->filter(fn (BaseField|FieldInterface $f) =>
+                        $f instanceof TextField
+                        || $f instanceof PlainText
+                        || $f instanceof CKEditorField
+                    );
+
+                $values = $fields->map(fn (TextField|PlainText|CKEditorField $f) =>
+                    $f instanceof CKEditorField ? $entry->getFieldValue($f->handle)->rawContent :
+                    $entry->getFieldValue($f->handle)
+                );
+
+                /** @var TextField|PlainText|CKEditorField $field */
+                foreach ($fields as $i => $field) {
+                    $entryFields[] = [
+                        'entrySection' => $entry->section->handle,
+                        'entrySlug' => $entry->slug,
+                        'handle' => $field->handle,
+                        'name' => $field->name,
+                        'value' => $values[$i],
+                    ];
+                }
+            }
+        }
+
         if ($json = json_encode($globals)) {
             $js = "window.availableGlobalSets = $json;";
+            Craft::$app->view->registerJs($js, View::POS_HEAD);
+        }
+        if (($json = json_encode($entryFields)) && !empty($entryFields)) {
+            $js = "window.availableEntryFields = $json;";
             Craft::$app->view->registerJs($js, View::POS_HEAD);
         }
     }

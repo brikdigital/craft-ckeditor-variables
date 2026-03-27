@@ -1,7 +1,7 @@
 import {Command} from "ckeditor5/src/core.js";
 
 export default class CKEditorVariablesCommand extends Command {
-	execute( { identifier, property, label } ) {
+	execute( { entrySection, entrySlug, identifier, property, label } ) {
 		const editor = this.editor;
 		const selection = editor.model.document.selection;
 
@@ -9,6 +9,8 @@ export default class CKEditorVariablesCommand extends Command {
 			// Create a <ckeditorVariable> element with the "name" attribute (and all the selection attributes)...
 			const ckeditorVariable = writer.createElement( 'ckeditorVariable', {
 				...Object.fromEntries( selection.getAttributes() ),
+        'data-entrysection': entrySection,
+        'data-entryslug': entrySlug,
 				'data-identifier': identifier,
 				'data-property': property,
 				'data-label': label

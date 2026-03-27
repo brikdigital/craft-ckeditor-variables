@@ -26,7 +26,8 @@ export default class CKEditorVariablesUI extends Plugin {
 
 			// Execute the command when the dropdown item is clicked (executed).
 			this.listenTo( dropdownView, 'execute', (evt) => {
-				editor.execute( 'ckeditorVariable', { identifier: evt.path[1].id, property: evt.source.id, label: evt.source.label } );
+        const { entrySlug, entrySection } = window.availableEntryFields.find(e => e.handle === evt.source.id) ?? {};
+				editor.execute( 'ckeditorVariable', { entrySlug, entrySection, identifier: evt.path[1].id, property: evt.source.id, label: evt.source.label } );
 				editor.editing.view.focus();
 			} );
 
@@ -37,6 +38,16 @@ export default class CKEditorVariablesUI extends Plugin {
 
 function getMenuDefinition() {
 	const definition = [];
+
+	const entryFields = window.availableEntryFields ?? [];
+	definition.push({
+		id: 'entryFields',
+		menu: 'Huidige entry',
+		children: entryFields.map((f) => ({
+      id: f.handle,
+      label: f.name,
+    })),
+	});
 
 	const globalSets = window.availableGlobalSets ?? [];
 	globalSets.forEach((globalSet) => {
