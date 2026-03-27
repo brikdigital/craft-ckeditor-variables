@@ -26,14 +26,33 @@ export default class CKEditorVariablesUI extends Plugin {
 
 			// Execute the command when the dropdown item is clicked (executed).
 			this.listenTo( dropdownView, 'execute', evt => {
-				const { entrySlug, entrySection } = window.availableEntryFields.find( e => e.handle === evt.source.id ) ?? {};
-				editor.execute( 'ckeditorVariable', {
-					entrySlug,
-					entrySection,
-					identifier: evt.path[ 1 ].id,
-					property: evt.source.id,
+				const variableType = evt.path[ 2 ].id ?? evt.path[ 1 ].id;
+				if ( !variableType ) {
+					throw new Error( 'dropdownView > execute: no variableType found for menu item' );
+				}
+
+				const data = {
+					variableType,
+					variable: evt.source.id,
 					label: evt.source.label
-				} );
+				};
+
+				if ( variableType === 'globals' ) {
+					data.globalSet = evt.path[ 1 ].id;
+				}
+
+				if ( variableType === 'entryFields' ) {
+					const { entrySlug, entrySection } =
+            window.availableEntryFields.find( e => e.handle === evt.source.id ) ?? {};
+					data.entrySlug = entrySlug;
+					data.entrySection = entrySection;
+				}
+
+				if ( variableType === 'entryTypes' ) {
+					data.entryTypeHandle = evt.path[ 1 ].id.split( '_' )[ 1 ];
+				}
+
+				editor.execute( 'ckeditorVariable', data );
 				editor.editing.view.focus();
 			} );
 
@@ -56,20 +75,31 @@ function getMenuDefinition() {
 	} );
 
 	const globalSets = window.availableGlobalSets ?? [];
-	globalSets.forEach( globalSet => {
-		const children = [];
-		globalSet.fields.forEach( field => {
-			children.push( {
-				id: field.handle,
-				label: field.name
-			} );
-		} );
+	definition.push( {
+		id: 'globals',
+		menu: 'Globals',
+		children: globalSets.map( set => ( {
+			id: set.handle,
+			menu: set.name,
+			children: set.fields.map( f => ( {
+				id: f.handle,
+				label: f.name
+			} ) )
+		} ) )
+	} );
 
-		definition.push( {
-			id: globalSet.handle,
-			menu: globalSet.name,
-			children
-		} );
+	const entryTypeFields = window.availableEntryTypeFields ?? [];
+	definition.push( {
+		id: 'entryTypes',
+		menu: 'Entry types',
+		children: Object.entries( entryTypeFields ).map( ( [ name, fields ] ) => ( {
+			id: `entryTypes_${ name }`,
+			menu: name,
+			children: fields.map( f => ( {
+				id: f.handle,
+				label: f.name
+			} ) )
+		} ) )
 	} );
 
 	return definition;

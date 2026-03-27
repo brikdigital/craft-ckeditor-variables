@@ -1,3 +1,5 @@
+/* eslint-disable no-nested-ternary */
+
 import { Plugin } from 'ckeditor5/src/core.js';
 import { toWidget, Widget } from 'ckeditor5/src/widget.js';
 
@@ -23,7 +25,16 @@ export default class CKEditorVariablesEditing extends Plugin {
 			// allowed in places where $text is allowed (e.g. in paragraphs).
 			// The inline widget can have the same attributes as text (for example linkHref, bold).
 			inheritAllFrom: '$inlineObject',
-			allowAttributes: [ 'data-entrysection', 'data-entryslug', 'data-identifier', 'data-property', 'data-label' ]
+			// eslint-disable-next-line max-len
+			allowAttributes: [
+				'data-variabletype',
+				'data-variable',
+				'data-label',
+				'data-globalset',
+				'data-entrysection',
+				'data-entryslug',
+				'data-entrytypehandle'
+			]
 		} );
 	}
 
@@ -36,18 +47,22 @@ export default class CKEditorVariablesEditing extends Plugin {
 				classes: [ 'ckeditor-variable' ]
 			},
 			model: ( viewElement, { writer: modelWriter } ) => {
+				const variableType = viewElement.getAttribute( 'data-variabletype' );
+				const variable = viewElement.getAttribute( 'data-variable' );
+				const label = viewElement.getAttribute( 'data-label' );
+				const globalSet = viewElement.getAttribute( 'data-globalset' );
 				const entrySection = viewElement.getAttribute( 'data-entrysection' );
 				const entrySlug = viewElement.getAttribute( 'data-entryslug' );
-				const identifier = viewElement.getAttribute( 'data-identifier' );
-				const property = viewElement.getAttribute( 'data-property' );
-				const label = viewElement.getAttribute( 'data-label' );
+				const entryTypeHandle = viewElement.getAttribute( 'data-entrytypehandle' );
 
 				return modelWriter.createElement( 'ckeditorVariable', {
+					'data-variabletype': variableType,
+					'data-variable': variable,
+					'data-label': label,
+					'data-globalset': globalSet,
 					'data-entrysection': entrySection,
 					'data-entryslug': entrySlug,
-					'data-identifier': identifier,
-					'data-property': property,
-					'data-label': label
+					'data-entrytypehandle': entryTypeHandle
 				} );
 			}
 		} );
@@ -69,26 +84,37 @@ export default class CKEditorVariablesEditing extends Plugin {
 
 		// Helper method for both downcast converters.
 		function createCKEditorVariableView( modelItem, viewWriter, dataDowncast = false ) {
+			const variableType = modelItem.getAttribute( 'data-variabletype' );
+			const variable = modelItem.getAttribute( 'data-variable' );
+			const label = modelItem.getAttribute( 'data-label' );
+			const globalSet = modelItem.getAttribute( 'data-globalset' );
 			const entrySection = modelItem.getAttribute( 'data-entrysection' );
 			const entrySlug = modelItem.getAttribute( 'data-entryslug' );
-			const identifier = modelItem.getAttribute( 'data-identifier' );
-			const property = modelItem.getAttribute( 'data-property' );
-			const label = modelItem.getAttribute( 'data-label' );
+			const entryTypeHandle = modelItem.getAttribute( 'data-entrytypehandle' );
 
-			const ckeditorVariableView = viewWriter.createContainerElement( dataDowncast ? 'span' : 'code', {
-				class: 'ckeditor-variable',
-				'data-entrysection': entrySection,
-				'data-entryslug': entrySlug,
-				'data-identifier': identifier,
-				'data-property': property,
-				'data-label': label
-			} );
+			const ckeditorVariableView = viewWriter.createContainerElement(
+				dataDowncast ? 'span' : 'code',
+				{
+					class: 'ckeditor-variable',
+					'data-variabletype': variableType,
+					'data-variable': variable,
+					'data-label': label,
+					'data-globalset': globalSet,
+					'data-entrysection': entrySection,
+					'data-entryslug': entrySlug,
+					'data-entrytypehandle': entryTypeHandle
+				}
+			);
 
 			// eslint-disable-next-line no-nested-ternary
 			const text = dataDowncast ?
-				entrySection !== undefined ?
-					`{entry:${ entrySection }/${ entrySlug }:${ property }}` :
-					`{globalset:${ identifier }:${ property }}` :
+				variableType === 'globals' ?
+					`{globalset:${ globalSet }:${ variable }}` :
+					variableType === 'entryFields' ?
+						`{entry:${ entrySection }/${ entrySlug }:${ variable }}` :
+						variableType === 'entryTypes' ?
+							`[[${ entryTypeHandle } ^_^ ${ variable }]]` :
+							`UNK_${ variableType }{${ variable },${ label },${ entrySection },${ entrySlug },${ entryTypeHandle }}` :
 				`{${ label }}`;
 			const innerText = viewWriter.createText( text );
 			viewWriter.insert( viewWriter.createPositionAt( ckeditorVariableView, 0 ), innerText );

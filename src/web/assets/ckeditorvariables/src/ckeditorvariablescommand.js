@@ -1,7 +1,19 @@
 import { Command } from 'ckeditor5/src/core.js';
 
 export default class CKEditorVariablesCommand extends Command {
-	execute( { entrySection, entrySlug, identifier, property, label } ) {
+	execute( {
+		// Base data
+		variableType,
+		variable,
+		label,
+		// Global set data
+		globalSet,
+		// Entry field data
+		entrySection,
+		entrySlug,
+		// Entry type field data
+		entryTypeHandle
+	} ) {
 		const editor = this.editor;
 		const selection = editor.model.document.selection;
 
@@ -9,11 +21,13 @@ export default class CKEditorVariablesCommand extends Command {
 			// Create a <ckeditorVariable> element with the "name" attribute (and all the selection attributes)...
 			const ckeditorVariable = writer.createElement( 'ckeditorVariable', {
 				...Object.fromEntries( selection.getAttributes() ),
+				'data-variabletype': variableType,
+				'data-variable': variable,
+				'data-label': label,
+				'data-globalset': globalSet,
 				'data-entrysection': entrySection,
 				'data-entryslug': entrySlug,
-				'data-identifier': identifier,
-				'data-property': property,
-				'data-label': label
+				'data-entrytypehandle': entryTypeHandle
 			} );
 
 			// ... and insert it into the document. Put the selection on the inserted element.

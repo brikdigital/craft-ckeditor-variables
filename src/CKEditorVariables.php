@@ -9,14 +9,15 @@ use craft\base\FieldInterface;
 use craft\base\Model;
 use craft\base\Plugin;
 use craft\ckeditor\Field as CKEditorField;
+use craft\elements\Entry;
+use craft\events\TemplateEvent;
 use craft\fieldlayoutelements\BaseField;
-use craft\fieldlayoutelements\entries\EntryTitleField;
 use craft\fieldlayoutelements\TextField;
 use craft\fields\PlainText;
-use craft\helpers\ArrayHelper;
 use craft\htmlfield\events\ModifyPurifierConfigEvent;
+use craft\models\FieldLayout;
+use craft\web\View;
 use yii\base\Event;
-use yii\web\View;
 
 /**
  * CKEditor variables plugin
@@ -38,6 +39,8 @@ class CKEditorVariables extends Plugin
 
         $this->attachEventHandlers();
         $this->registerGlobals();
+        $this->registerEntryFields();
+        $this->registerEntryTypes();
 
         \craft\ckeditor\Plugin::registerCkeditorPackage(CKEditorVariablesAsset::class);
     }
@@ -49,12 +52,30 @@ class CKEditorVariables extends Plugin
             CKEditorField::class,
             CKEditorField::EVENT_MODIFY_PURIFIER_CONFIG,
             function (ModifyPurifierConfigEvent $event) {
-                $dataAttributes = ['identifier', 'property', 'label'];
+                $dataAttributes = ['variabletype', 'variable', 'label', 'globalset', 'entrysection', 'entryslug', 'entrytypehandle'];
                 if ($def = $event->config->getDefinition('HTML', true)) {
                     foreach ($dataAttributes as $dataAttribute) {
                         $def->addAttribute('span', "data-$dataAttribute", 'Text');
                     }
                 }
+            }
+        );
+
+        Event::on(
+            View::class,
+            View::EVENT_AFTER_RENDER_TEMPLATE,
+            function (TemplateEvent $event) {
+                if (Craft::$app->request->isCpRequest) return;
+                /** @var Entry $entry */
+                $entry = $event->variables['entry'];
+                if (empty($entry)) return;
+
+                $event->output = preg_replace_callback("/\[\[(?<type>\w+) \^_\^ (?<field>\w+)]]/", function ($matches) use ($entry) {
+                    if ($entry->type->handle !== $matches['type']) return '';
+                    return $matches['field'] === 'title'
+                        ? $entry->title
+                        : $entry->getFieldValue($matches['field']);
+                }, $event->output);
             }
         );
     }
@@ -86,53 +107,80 @@ class CKEditorVariables extends Plugin
             ];
         }
 
+        if ($json = json_encode($globals)) {
+            $js = "window.availableGlobalSets = $json;";
+            Craft::$app->view->registerJs($js, View::POS_HEAD);
+        }
+    }
+
+    private function registerEntryFields(): void {
+        if (!Craft::$app->getRequest()->getIsCpRequest())
+            return;
+
         $entryFields = [];
         preg_match("/entries\/(?<section>\w+)\/(?<elementId>\d+)-(?<slug>(?:[^\/]*)?)/", Craft::$app->request->pathInfo, $matches);
         if (!empty($matches['slug'])) {
             $entry = Craft::$app->entries->getEntryById($matches['elementId']);
             $layout = $entry->getFieldLayout();
             if ($layout !== null) {
-                $fields = collect($layout->getCustomFields())
-                    ->filter(fn (BaseField|FieldInterface $f) =>
-                        $f instanceof TextField
-                        || $f instanceof PlainText
-                        || $f instanceof CKEditorField
-                    );
-
-                $values = $fields->map(fn (TextField|PlainText|CKEditorField $f) =>
-                    $f instanceof CKEditorField ? $entry->getFieldValue($f->handle)->rawContent :
-                    $entry->getFieldValue($f->handle)
-                );
-
-                $entryFields[] = [
-                    'entrySection' => $entry->section->handle,
-                    'entrySlug' => $entry->slug,
-                    'handle' => 'title',
-                    'name' => 'Titel',
-                    'value' => $entry->title,
-                ];
-
-                /** @var TextField|PlainText|CKEditorField $field */
-                foreach ($fields as $i => $field) {
-                    $entryFields[] = [
-                        'entrySection' => $entry->section->handle,
-                        'entrySlug' => $entry->slug,
-                        'handle' => $field->handle,
-                        'name' => $field->name,
-                        'value' => $values[$i],
-                    ];
-                }
+                $entryFields = collect($this->collectLayoutFields($layout))->map(function ($f) use ($entry) {
+                    $f['entrySection'] = $entry->section->handle;
+                    $f['entrySlug'] = $entry->slug;
+                    return $f;
+                });
             }
         }
 
-        if ($json = json_encode($globals)) {
-            $js = "window.availableGlobalSets = $json;";
-            Craft::$app->view->registerJs($js, View::POS_HEAD);
-        }
-        if (($json = json_encode($entryFields)) && !empty($entryFields)) {
+        if (($json = json_encode($entryFields, JSON_THROW_ON_ERROR)) && count($entryFields) !== 0) {
             $js = "window.availableEntryFields = $json;";
             Craft::$app->view->registerJs($js, View::POS_HEAD);
         }
+    }
+
+    private function registerEntryTypes(): void {
+        if (!Craft::$app->getRequest()->getIsCpRequest())
+            return;
+
+        $entryTypeFields = [];
+        foreach ($this->getSettings()->entryTypes as $entryType) {
+            $entryType = Craft::$app->entries->getEntryTypeByHandle($entryType);
+
+            $layout = $entryType->getFieldLayout();
+            if ($layout !== null) {
+                $entryTypeFields[$entryType->handle] = collect($this->collectLayoutFields($layout));
+            }
+        }
+
+        if (($json = json_encode($entryTypeFields)) && count($entryTypeFields) !== 0) {
+            $js = "window.availableEntryTypeFields = $json;";
+            Craft::$app->view->registerJs($js, View::POS_HEAD);
+        }
+    }
+
+    private function collectLayoutFields(FieldLayout $layout) {
+        $layoutFields = [];
+
+        $fields = collect($layout->getCustomFields())
+            ->filter(fn (BaseField|FieldInterface $f) =>
+                $f instanceof TextField
+                || $f instanceof PlainText
+                || $f instanceof CKEditorField
+            );
+
+        $layoutFields[] = [
+            'handle' => 'title',
+            'name' => 'Titel',
+        ];
+
+        /** @var TextField|PlainText|CKEditorField $field */
+        foreach ($fields as $i => $field) {
+            $layoutFields[] = [
+                'handle' => $field->handle,
+                'name' => $field->name,
+            ];
+        }
+
+        return $layoutFields;
     }
 
     protected function createSettingsModel(): ?Model
