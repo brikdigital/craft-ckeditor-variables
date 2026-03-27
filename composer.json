@@ -2,7 +2,7 @@
   "name": "brikdigital/craft-ckeditor-variables",
   "description": "Use Craft globals as variables in CKEditor fields",
   "type": "craft-plugin",
-  "version": "5.2.0",
+  "version": "5.2.1",
   "keywords": [
     "craft",
     "cms",
