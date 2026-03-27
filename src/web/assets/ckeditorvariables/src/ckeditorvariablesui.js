@@ -1,5 +1,5 @@
-import { Plugin } from "ckeditor5/src/core.js";
-import { addMenuToDropdown, createDropdown } from "ckeditor5/src/ui.js";
+import { Plugin } from 'ckeditor5/src/core.js';
+import { addMenuToDropdown, createDropdown } from 'ckeditor5/src/ui.js';
 
 import ckeditor5Icon from '../theme/icons/ckeditor.svg';
 
@@ -18,16 +18,22 @@ export default class CKEditorVariablesUI extends Plugin {
 			} );
 
 			// Populate the list in the dropdown with items.
-			addMenuToDropdown(dropdownView, editor.ui.view.body, getMenuDefinition());
+			addMenuToDropdown( dropdownView, editor.ui.view.body, getMenuDefinition() );
 
 			// Disable the placeholder button when the command is disabled.
 			const command = editor.commands.get( 'ckeditorVariable' );
 			dropdownView.bind( 'isEnabled' ).to( command );
 
 			// Execute the command when the dropdown item is clicked (executed).
-			this.listenTo( dropdownView, 'execute', (evt) => {
-        const { entrySlug, entrySection } = window.availableEntryFields.find(e => e.handle === evt.source.id) ?? {};
-				editor.execute( 'ckeditorVariable', { entrySlug, entrySection, identifier: evt.path[1].id, property: evt.source.id, label: evt.source.label } );
+			this.listenTo( dropdownView, 'execute', evt => {
+				const { entrySlug, entrySection } = window.availableEntryFields.find( e => e.handle === evt.source.id ) ?? {};
+				editor.execute( 'ckeditorVariable', {
+					entrySlug,
+					entrySection,
+					identifier: evt.path[ 1 ].id,
+					property: evt.source.id,
+					label: evt.source.label
+				} );
 				editor.editing.view.focus();
 			} );
 
@@ -40,31 +46,31 @@ function getMenuDefinition() {
 	const definition = [];
 
 	const entryFields = window.availableEntryFields ?? [];
-	definition.push({
+	definition.push( {
 		id: 'entryFields',
 		menu: 'Huidige entry',
-		children: entryFields.map((f) => ({
-      id: f.handle,
-      label: f.name,
-    })),
-	});
+		children: entryFields.map( f => ( {
+			id: f.handle,
+			label: f.name
+		} ) )
+	} );
 
 	const globalSets = window.availableGlobalSets ?? [];
-	globalSets.forEach((globalSet) => {
+	globalSets.forEach( globalSet => {
 		const children = [];
-		globalSet.fields.forEach((field) => {
-			children.push({
+		globalSet.fields.forEach( field => {
+			children.push( {
 				id: field.handle,
-				label: field.name,
-			});
-		});
+				label: field.name
+			} );
+		} );
 
-		definition.push({
+		definition.push( {
 			id: globalSet.handle,
 			menu: globalSet.name,
-			children: children
-		});
-	});
+			children
+		} );
+	} );
 
 	return definition;
 }

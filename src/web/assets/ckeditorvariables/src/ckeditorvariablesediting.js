@@ -1,10 +1,10 @@
-import {Plugin} from "ckeditor5/src/core.js";
-import {toWidget, Widget} from "ckeditor5/src/widget.js";
+import { Plugin } from 'ckeditor5/src/core.js';
+import { toWidget, Widget } from 'ckeditor5/src/widget.js';
 
-import CKEditorVariablesCommand from "./ckeditorvariablescommand.js";
+import CKEditorVariablesCommand from './ckeditorvariablescommand.js';
 
 export default class CKEditorVariablesEditing extends Plugin {
-	static get requires() {                                                    // ADDED
+	static get requires() { // ADDED
 		return [ Widget ];
 	}
 
@@ -23,7 +23,7 @@ export default class CKEditorVariablesEditing extends Plugin {
 			// allowed in places where $text is allowed (e.g. in paragraphs).
 			// The inline widget can have the same attributes as text (for example linkHref, bold).
 			inheritAllFrom: '$inlineObject',
-			allowAttributes: ['data-entrysection', 'data-entryslug', 'data-identifier', 'data-property', 'data-label']
+			allowAttributes: [ 'data-entrysection', 'data-entryslug', 'data-identifier', 'data-property', 'data-label' ]
 		} );
 	}
 
@@ -33,22 +33,22 @@ export default class CKEditorVariablesEditing extends Plugin {
 		conversion.for( 'upcast' ).elementToElement( {
 			view: {
 				name: 'span',
-				classes: ['ckeditor-variable'],
+				classes: [ 'ckeditor-variable' ]
 			},
 			model: ( viewElement, { writer: modelWriter } ) => {
-				const entrySection = viewElement.getAttribute('data-entrysection');
-				const entrySlug = viewElement.getAttribute('data-entryslug');
-				const identifier = viewElement.getAttribute('data-identifier');
-				const property = viewElement.getAttribute('data-property');
-				const label = viewElement.getAttribute('data-label');
+				const entrySection = viewElement.getAttribute( 'data-entrysection' );
+				const entrySlug = viewElement.getAttribute( 'data-entryslug' );
+				const identifier = viewElement.getAttribute( 'data-identifier' );
+				const property = viewElement.getAttribute( 'data-property' );
+				const label = viewElement.getAttribute( 'data-label' );
 
-				return modelWriter.createElement('ckeditorVariable', {
+				return modelWriter.createElement( 'ckeditorVariable', {
 					'data-entrysection': entrySection,
 					'data-entryslug': entrySlug,
 					'data-identifier': identifier,
 					'data-property': property,
-					'data-label': label,
-				});
+					'data-label': label
+				} );
 			}
 		} );
 
@@ -64,34 +64,34 @@ export default class CKEditorVariablesEditing extends Plugin {
 
 		conversion.for( 'dataDowncast' ).elementToElement( {
 			model: 'ckeditorVariable',
-			view: ( modelItem, { writer: viewWriter } ) => createCKEditorVariableView(modelItem, viewWriter, true)
+			view: ( modelItem, { writer: viewWriter } ) => createCKEditorVariableView( modelItem, viewWriter, true )
 		} );
 
 		// Helper method for both downcast converters.
 		function createCKEditorVariableView( modelItem, viewWriter, dataDowncast = false ) {
-			const entrySection = modelItem.getAttribute('data-entrysection');
-			const entrySlug = modelItem.getAttribute('data-entryslug');
-			const identifier = modelItem.getAttribute('data-identifier');
-			const property = modelItem.getAttribute('data-property');
-			const label = modelItem.getAttribute('data-label');
+			const entrySection = modelItem.getAttribute( 'data-entrysection' );
+			const entrySlug = modelItem.getAttribute( 'data-entryslug' );
+			const identifier = modelItem.getAttribute( 'data-identifier' );
+			const property = modelItem.getAttribute( 'data-property' );
+			const label = modelItem.getAttribute( 'data-label' );
 
-			const ckeditorVariableView = viewWriter.createContainerElement(dataDowncast ? 'span' : 'code', {
+			const ckeditorVariableView = viewWriter.createContainerElement( dataDowncast ? 'span' : 'code', {
 				class: 'ckeditor-variable',
 				'data-entrysection': entrySection,
 				'data-entryslug': entrySlug,
 				'data-identifier': identifier,
 				'data-property': property,
 				'data-label': label
-			});
+			} );
 
 			// eslint-disable-next-line no-nested-ternary
-			const text = dataDowncast
-				? entrySection !== undefined
-					? `{entry:${entrySection}/${entrySlug}:${property}}`
-					: `{globalset:${identifier}:${property}}`
-				: `{${label}}`;
-			const innerText = viewWriter.createText(text);
-			viewWriter.insert(viewWriter.createPositionAt(ckeditorVariableView, 0), innerText);
+			const text = dataDowncast ?
+				entrySection !== undefined ?
+					`{entry:${ entrySection }/${ entrySlug }:${ property }}` :
+					`{globalset:${ identifier }:${ property }}` :
+				`{${ label }}`;
+			const innerText = viewWriter.createText( text );
+			viewWriter.insert( viewWriter.createPositionAt( ckeditorVariableView, 0 ), innerText );
 
 			return ckeditorVariableView;
 		}
