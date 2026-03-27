@@ -146,14 +146,24 @@ class CKEditorVariables extends Plugin
         foreach (Craft::$app->getGlobals()->getAllSets() as $globalSet) {
             $globals[] = [
                 'label' => $globalSet->name,
-                'value' => $globalSet->handle
+                'value' => $globalSet->handle,
             ];
         }
+
+        $entryTypes = [];
+        foreach (Craft::$app->entries->getAllEntryTypes() as $entryType) {
+            $entryTypes[] = [
+                'label' => $entryType->name,
+                'value' => $entryType->handle,
+            ];
+        }
+
         return Craft::$app->getView()->renderTemplate(
             'ckeditor-variables/settings',
             [
                 'globals' => $globals,
-                'settings' => $this->getSettings()
+                'entryTypes' => $entryTypes,
+                'settings' => $this->getSettings(),
             ]
         );
     }

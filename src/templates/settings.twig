@@ -8,4 +8,11 @@
         options: globals,
         values: settings.globals
     }) }}
+    {{ forms.selectizeField({
+        multi: true,
+        label: 'Available entry types',
+        name: 'entryTypes',
+        options: entryTypes,
+        values: settings.entryTypes
+    }) }}
 </div>
