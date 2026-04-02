@@ -117,10 +117,14 @@ class CKEditorVariables extends Plugin
         if (!Craft::$app->getRequest()->getIsCpRequest())
             return;
 
+        $currentSite = Craft::$app->sites->currentSite;
         $entryFields = [];
         preg_match("/entries\/(?<section>\w+)\/(?<elementId>\d+)-(?<slug>(?:[^\/]*)?)/", Craft::$app->request->pathInfo, $matches);
+
         if (!empty($matches['slug'])) {
-            $entry = Craft::$app->entries->getEntryById($matches['elementId']);
+            $entry = Entry::find()->slug($matches['slug'])->siteId($currentSite->id)->one();
+            if ($entry === null) return;
+
             $layout = $entry->getFieldLayout();
             if ($layout !== null) {
                 $entryFields = collect($this->collectLayoutFields($layout))->map(function ($f) use ($entry) {
