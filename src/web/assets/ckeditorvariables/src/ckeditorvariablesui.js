@@ -65,42 +65,48 @@ function getMenuDefinition() {
 	const definition = [];
 
 	const entryFields = window.availableEntryFields ?? [];
-	definition.push( {
-		id: 'entryFields',
-		menu: 'Huidige entry',
-		children: entryFields.map( f => ( {
-			id: f.handle,
-			label: f.name
-		} ) )
-	} );
+	if ( entryFields.length ) {
+		definition.push( {
+			id: 'entryFields',
+			menu: 'Huidige entry',
+			children: entryFields.map( f => ( {
+				id: f.handle,
+				label: f.name
+			} ) )
+		} );
+	}
 
 	const globalSets = window.availableGlobalSets ?? [];
-	definition.push( {
-		id: 'globals',
-		menu: 'Globals',
-		children: globalSets.map( set => ( {
-			id: set.handle,
-			menu: set.name,
-			children: set.fields.map( f => ( {
-				id: f.handle,
-				label: f.name
+	if ( globalSets.length ) {
+		definition.push( {
+			id: 'globals',
+			menu: 'Globals',
+			children: globalSets.map( set => ( {
+				id: set.handle,
+				menu: set.name,
+				children: set.fields.map( f => ( {
+					id: f.handle,
+					label: f.name
+				} ) )
 			} ) )
-		} ) )
-	} );
+		} );
+	}
 
 	const entryTypeFields = window.availableEntryTypeFields ?? [];
-	definition.push( {
-		id: 'entryTypes',
-		menu: 'Entry types',
-		children: Object.entries( entryTypeFields ).map( ( [ name, fields ] ) => ( {
-			id: `entryTypes_${ name }`,
-			menu: name,
-			children: fields.map( f => ( {
-				id: f.handle,
-				label: f.name
+	if ( entryTypeFields.length ) {
+		definition.push( {
+			id: 'entryTypes',
+			menu: 'Entry types',
+			children: Object.entries( entryTypeFields ).map( ( [ name, fields ] ) => ( {
+				id: `entryTypes_${ name }`,
+				menu: name,
+				children: fields.map( f => ( {
+					id: f.handle,
+					label: f.name
+				} ) )
 			} ) )
-		} ) )
-	} );
+		} );
+	}
 
 	return definition;
 }
