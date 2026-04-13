@@ -87,10 +87,12 @@ class CKEditorVariables extends Plugin
 
         $globals = [];
         foreach ($this->getSettings()->globals as $handle) {
-            $globalSet = Craft::$app->getGlobals()->getSetByHandle($handle);
+            $globalSet = GlobalSet::find()->siteId(CpHelper::requestedSite()->id)->handle($handle)->one();
+            $layout = $globalSet->getFieldLayout();
+            $generatedValues = $globalSet->getGeneratedFieldValues();
             $fields = [];
 
-            foreach ($globalSet->getFieldLayout()->getCustomFields() as $field) {
+            foreach ($layout->getCustomFields() as $field) {
                 if (in_array($field::class, $this->supportedFieldTypes)) {
                     $fields[] = [
                         'handle' => $field->getHandle(),
@@ -98,6 +100,14 @@ class CKEditorVariables extends Plugin
                         'value' => $globalSet->getFieldValue($field->getHandle()),
                     ];
                 }
+            }
+
+            foreach ($layout->getGeneratedFields() as $field) {
+                $fields[] = [
+                    'handle' => $field['handle'],
+                    'name' => $field['name'],
+                    'value' => $generatedValues[$field['handle']] ?? '<empty>',
+                ];
             }
 
             $globals[] = [
