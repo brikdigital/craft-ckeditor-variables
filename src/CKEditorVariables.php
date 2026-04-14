@@ -89,7 +89,8 @@ class CKEditorVariables extends Plugin
 
         $globals = [];
         foreach ($this->getSettings()->globals as $handle) {
-            $globalSet = GlobalSet::find()->siteId(CpHelper::requestedSite()->id)->handle($handle)->one();
+            $site = CpHelper::requestedSite() ?? Craft::$app->sites->currentSite;
+            $globalSet = GlobalSet::find()->siteId($site->id)->handle($handle)->one();
             $layout = $globalSet->getFieldLayout();
             $generatedValues = $globalSet->getGeneratedFieldValues();
             $fields = [];
