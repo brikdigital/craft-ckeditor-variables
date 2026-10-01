@@ -1,54 +1,71 @@
-import { Plugin } from 'ckeditor5/src/core.js';
-import { addMenuToDropdown, createDropdown } from 'ckeditor5/src/ui.js';
+import {
+	addMenuToDropdown,
+	createDropdown,
+	type DropdownMenuDefinition,
+	Plugin
+} from 'ckeditor5';
 
-import ckeditor5Icon from '../theme/icons/ckeditor.svg';
+import variablesIcon from '../theme/variables.svg';
 
-export default class CKEditorVariablesUI extends Plugin {
-	init() {
+export default class VariablesUI extends Plugin {
+	public init(): void {
 		const editor = this.editor;
 
-		// Define toolbar item
 		editor.ui.componentFactory.add( 'ckeditorVariables', locale => {
 			const dropdownView = createDropdown( locale );
 			dropdownView.buttonView.set( {
 				label: 'Variables',
-				icon: ckeditor5Icon,
+				icon: variablesIcon,
 				tooltip: true,
 				withText: true
 			} );
 
-			// Populate the list in the dropdown with items.
 			addMenuToDropdown( dropdownView, editor.ui.view.body, getMenuDefinition() );
 
-			// Disable the placeholder button when the command is disabled.
 			const command = editor.commands.get( 'ckeditorVariable' );
-			dropdownView.bind( 'isEnabled' ).to( command );
+			if ( command ) {
+				dropdownView.bind( 'isEnabled' ).to( command );
+			}
 
-			// Execute the command when the dropdown item is clicked (executed).
 			this.listenTo( dropdownView, 'execute', evt => {
+				// @ts-expect-error whose idea was it to type things as `object`
 				const variableType = evt.path[ 2 ].id ?? evt.path[ 1 ].id;
 				if ( !variableType ) {
 					throw new Error( 'dropdownView > execute: no variableType found for menu item' );
 				}
 
-				const data = {
+				const data: Record<string, string> = {
 					variableType,
+					// @ts-expect-error whose idea was it to type things as `object`
 					variable: evt.source.id,
+					// @ts-expect-error whose idea was it to type things as `object`
 					label: evt.source.label
 				};
 
 				if ( variableType === 'globals' ) {
+					// @ts-expect-error whose idea was it to type things as `object`
 					data.globalSet = evt.path[ 1 ].id;
 				}
 
 				if ( variableType === 'entryFields' ) {
-					const { entrySlug, entrySection } =
-            window.availableEntryFields.find( e => e.handle === evt.source.id ) ?? {};
-					data.entrySlug = entrySlug;
-					data.entrySection = entrySection;
+					// @ts-expect-error whose idea was it to type things as `object`
+					const entryField = window.availableEntryFields.find( e => e.handle === evt.source.id );
+					if ( entryField ) {
+						data.entrySlug = entryField.entrySlug;
+						data.entrySection = entryField.entrySection;
+					} else {
+						if ( window.ALYX_DEBUG_LOGGING ) {
+							console.warn(
+								// @ts-expect-error whose idea was it to type things as `object`
+								`[ckeditorVariables/execute] Entry field with handle '${ evt.source.id }'` +
+								'wasn\'t found in window.availableEntryFields!'
+							);
+						}
+					}
 				}
 
 				if ( variableType === 'entryTypes' ) {
+					// @ts-expect-error whose idea was it to type things as `object`
 					data.entryTypeHandle = evt.path[ 1 ].id.split( '_' )[ 1 ];
 				}
 
@@ -62,7 +79,7 @@ export default class CKEditorVariablesUI extends Plugin {
 }
 
 function getMenuDefinition() {
-	const definition = [];
+	const definition: DropdownMenuDefinition = [];
 
 	const entryFields = window.availableEntryFields ?? [];
 	if ( entryFields.length ) {

@@ -10,10 +10,7 @@ This package was created by the [ckeditor5-package-generator](https://www.npmjs.
   * [`start`](#start)
   * [`test`](#test)
   * [`lint`](#lint)
-  * [`stylelint`](#stylelint)
   * [`build:dist`](#builddist)
-  * [`dll:build`](#dllbuild)
-  * [`dll:serve`](#dllserve)
   * [`translations:synchronize`](#translationssynchronize)
   * [`translations:validate`](#translationsvalidate)
 * [License](#license)
@@ -26,7 +23,7 @@ To read about the CKEditor 5 Framework, visit the [CKEditor 5 Framework document
 
 NPM scripts are a convenient way to provide commands in a project. They are defined in the `package.json` file and shared with people contributing to the project. It ensures developers use the same command with the same options (flags).
 
-All the scripts can be executed by running `npm run <script>`. Pre and post commands with matching names will be run for those as well.
+All the scripts can be executed by running `pnpm run <script>`. Pre and post commands with matching names will be run for those as well.
 
 The following scripts are available in the package.
 
@@ -34,21 +31,11 @@ The following scripts are available in the package.
 
 Starts an HTTP server with the live-reload mechanism that allows previewing and testing of plugins available in the package.
 
-When the server starts, the default browser will open the developer sample. This can be disabled by passing the `--no-open` option to that command.
-
-You can also define the language that will translate the created editor by specifying the `--language [LANG]` option. It defaults to `'en'`.
-
 Examples:
 
 ```bash
 # Starts the server and open the browser.
-npm run start
-
-# Disable auto-opening the browser.
-npm run start -- --no-open
-
-# Create the editor with the interface in German.
-npm run start -- --language=de
+pnpm run start
 ```
 
 ### `test`
@@ -59,68 +46,36 @@ Examples:
 
 ```bash
 # Execute tests.
-npm run test
+pnpm run test
 
 # Generate code coverage report after each change in the sources.
-npm run test -- --coverage
+pnpm run test --coverage
 ```
 
 ### `lint`
 
-Runs ESLint, which analyzes the code (all `*.js` files) to quickly find problems.
+Runs ESLint, which analyzes the code to quickly find problems. It covers all `*.ts` files as well as
+the CSS code (`*.css` files in the `theme/` directory).
 
 Examples:
 
 ```bash
 # Execute eslint.
-npm run lint
+pnpm run lint
+
+# Auto-fix problems.
+pnpm run lint --fix
 ```
 
-### `stylelint`
+### `build`
 
-Similar to the `lint` task, stylelint analyzes the CSS code (`*.css` files in the `theme/` directory) in the package.
-
-Examples:
-
-```bash
-# Execute stylelint.
-npm run stylelint
-```
-
-### `build:dist`
-
-Creates npm and browser builds of your plugin. These builds can be added to the editor following the [Configuring CKEditor 5 features](https://ckeditor.com/docs/ckeditor5/latest/getting-started/setup/configuration.html) guide.
+Creates npm and browser builds of your plugin. These builds can be added to the editor by following the [Configuring CKEditor 5 features](https://ckeditor.com/docs/ckeditor5/latest/getting-started/setup/configuration.html) guide.
 
 Examples:
 
 ```bash
 # Builds the `npm` and browser files thats are ready to publish.
-npm run build:dist
-```
-
-### `dll:build`
-
-Creates a DLL-compatible package build that can be loaded into an editor using [DLL builds](https://ckeditor.com/docs/ckeditor5/latest/builds/guides/development/dll-builds.html).
-
-Examples:
-
-```bash
-# Build the DLL file that is ready to publish.
-npm run dll:build
-
-# Build the DLL file and listen to changes in its sources.
-npm run dll:build -- --watch
-```
-
-### `dll:serve`
-
-Creates a simple HTTP server (without the live-reload mechanism) that allows verifying whether the DLL build of the package is compatible with the CKEditor 5 [DLL builds](https://ckeditor.com/docs/ckeditor5/latest/builds/guides/development/dll-builds.html).
-
-Examples:
-
-```bash
-# Starts the HTTP server and opens the browser.
-npm run dll:serve
+pnpm run build
 ```
 
 ### `translations:synchronize`
@@ -129,10 +84,10 @@ Synchronizes translation messages (arguments of the `t()` function) by performin
 
  * Collect all translation messages from the package by finding `t()` calls in source files.
  * Detect if translation context is valid, i.e. whether the provided values do not interfere with the values specified in the `@ckeditor/ckeditor5-core` package.
- * If there are no validation errors, update all translation files (`*.po` files) to be in sync with the context file:
+ * If there are no validation errors, update all translation source files (`lang/translations/*.ts`) to be in sync with the context file:
    * unused translation entries are removed,
    * missing translation entries are added with empty string as the message translation,
-   * missing translation files are created for languages that do not have own `*.po` file yet.
+   * missing translation files are created for languages that do not have their own `lang/translations/*.ts` file yet.
 
 The task may end with an error if one of the following conditions is met:
 
@@ -140,10 +95,12 @@ The task may end with an error if one of the following conditions is met:
 * Found the `Duplicated contex` error &ndash; some of the entries are duplicated. Consider removing them from the `lang/contexts.json` file, or rewriting them.
 * Found the `Missing context` error &ndash; entries specified in source files are not described in the `lang/contexts.json` file. They should be added.
 
+Generated translation sources import the `Translations` type from the package's existing `ckeditor5` dependency.
+
 Examples:
 
 ```bash
-npm run translations:synchronize
+pnpm run translations:synchronize
 ```
 
 ### `translations:validate`
@@ -153,11 +110,11 @@ Peforms only validation steps as described in [`translations:synchronize`](#tran
 Examples:
 
 ```bash
-npm run translations:validate
+pnpm run translations:validate
 ```
 
 ## License
 
-The `@brikdigital/ckeditor5-variables` package is available under [MIT license](https://opensource.org/licenses/MIT).
+The `@brikdigital/ckeditor5-paste-plain` package is available under [MIT license](https://opensource.org/licenses/MIT).
 
 However, it is the default license of packages created by the [ckeditor5-package-generator](https://www.npmjs.com/package/ckeditor5-package-generator) package and can be changed.

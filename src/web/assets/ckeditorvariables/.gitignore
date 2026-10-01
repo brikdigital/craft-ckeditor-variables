@@ -1,5 +1,25 @@
-dist/
-coverage/
-node_modules/
-tmp/
-sample/ckeditor.dist.js
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+node_modules
+dist/*
+!dist/browser/
+dist/browser/*
+!dist/browser/index.es.js
+coverage
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?

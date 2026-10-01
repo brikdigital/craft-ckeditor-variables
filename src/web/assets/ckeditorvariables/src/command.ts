@@ -1,7 +1,7 @@
-import { Command } from 'ckeditor5/src/core.js';
+import { Command, type ModelElement } from 'ckeditor5';
 
-export default class CKEditorVariablesCommand extends Command {
-	execute( {
+export default class VariablesCommand extends Command {
+	public override execute( {
 		// Base data
 		variableType,
 		variable,
@@ -13,13 +13,12 @@ export default class CKEditorVariablesCommand extends Command {
 		entrySlug,
 		// Entry type field data
 		entryTypeHandle
-	} ) {
+	}: Record<string, string> ): void {
 		const editor = this.editor;
 		const selection = editor.model.document.selection;
 
 		editor.model.change( writer => {
-			// Create a <ckeditorVariable> element with the "name" attribute (and all the selection attributes)...
-			const ckeditorVariable = writer.createElement( 'ckeditorVariable', {
+			const variableEl = writer.createElement( 'ckeditorVariable', {
 				...Object.fromEntries( selection.getAttributes() ),
 				'data-variabletype': variableType,
 				'data-variable': variable,
@@ -30,15 +29,17 @@ export default class CKEditorVariablesCommand extends Command {
 				'data-entrytypehandle': entryTypeHandle
 			} );
 
-			// ... and insert it into the document. Put the selection on the inserted element.
-			editor.model.insertObject( ckeditorVariable );
+			editor.model.insertObject( variableEl );
 		} );
 	}
 
-	refresh() {
+	public override refresh(): void {
 		const model = this.editor.model;
-		const selection = model.document.selection;
+		const focus = model.document.selection.focus;
+		if ( !focus ) {
+			return;
+		}
 
-		this.isEnabled = model.schema.checkChild( selection.focus.parent, 'ckeditorVariable' );
+		this.isEnabled = model.schema.checkChild( focus.parent as ModelElement, 'ckeditorVariable' );
 	}
 }

@@ -44,7 +44,7 @@ class CKEditorVariables extends Plugin
         $this->registerEntryFields();
         $this->registerEntryTypes();
 
-        \craft\ckeditor\Plugin::registerCkeditorPackage(CKEditorVariablesAsset::class);
+        \craft\ckeditor\Plugin::registerCkeditorPackage(CKEditorVariablesAsset::class, 'index.es.js');
     }
 
     private function attachEventHandlers()

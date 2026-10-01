@@ -6,17 +6,15 @@ use craft\ckeditor\web\assets\BaseCkeditorPackageAsset;
 
 class CKEditorVariablesAsset extends BaseCkeditorPackageAsset
 {
-    public $sourcePath = __DIR__ . '/build';
+	public $sourcePath = __DIR__ . '/dist/browser';
 
-    public $js = [
-        'variables.js',
-    ];
+	public string $namespace = '@brikdigital/ckeditor5-variables';
 
-    public array $pluginNames = [
-        'CKEditorVariables',
-    ];
+	public $js = [
+		['index.es.js', 'type' => 'module'],
+	];
 
-    public array $toolbarItems = [
-        'ckeditorVariables',
-    ];
+	public array $pluginNames = [
+		'Variables',
+	];
 }

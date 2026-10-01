@@ -1,31 +1,23 @@
 /* eslint-disable no-nested-ternary */
 
-import { Plugin } from 'ckeditor5/src/core.js';
-import { toWidget, Widget } from 'ckeditor5/src/widget.js';
+import { type ModelElement, Plugin, toWidget, type ViewDowncastWriter, Widget } from 'ckeditor5';
+import VariablesCommand from './command';
 
-import CKEditorVariablesCommand from './ckeditorvariablescommand.js';
-
-export default class CKEditorVariablesEditing extends Plugin {
-	static get requires() { // ADDED
+export default class VariablesEditing extends Plugin {
+	public static get requires() {
 		return [ Widget ];
 	}
 
-	init() {
+	public init(): void {
 		this._defineSchema();
 		this._defineConverters();
 
-		this.editor.commands.add( 'ckeditorVariable', new CKEditorVariablesCommand( this.editor ) );
+		this.editor.commands.add( 'ckeditorVariable', new VariablesCommand( this.editor ) );
 	}
 
-	_defineSchema() {
-		const schema = this.editor.model.schema;
-
-		schema.register( 'ckeditorVariable', {
-			// Behaves like a self-contained inline object (e.g. an inline image)
-			// allowed in places where $text is allowed (e.g. in paragraphs).
-			// The inline widget can have the same attributes as text (for example linkHref, bold).
+	private _defineSchema(): void {
+		this.editor.model.schema.register( 'ckeditorVariable', {
 			inheritAllFrom: '$inlineObject',
-			// eslint-disable-next-line max-len
 			allowAttributes: [
 				'data-variabletype',
 				'data-variable',
@@ -38,7 +30,7 @@ export default class CKEditorVariablesEditing extends Plugin {
 		} );
 	}
 
-	_defineConverters() {
+	private _defineConverters(): void {
 		const conversion = this.editor.conversion;
 
 		conversion.for( 'upcast' ).elementToElement( {
@@ -72,7 +64,6 @@ export default class CKEditorVariablesEditing extends Plugin {
 			view: ( modelItem, { writer: viewWriter } ) => {
 				const widgetElement = createCKEditorVariableView( modelItem, viewWriter );
 
-				// Enable widget handling on a ckeditor variable inside the editing view.
 				return toWidget( widgetElement, viewWriter );
 			}
 		} );
@@ -82,8 +73,7 @@ export default class CKEditorVariablesEditing extends Plugin {
 			view: ( modelItem, { writer: viewWriter } ) => createCKEditorVariableView( modelItem, viewWriter, true )
 		} );
 
-		// Helper method for both downcast converters.
-		function createCKEditorVariableView( modelItem, viewWriter, dataDowncast = false ) {
+		function createCKEditorVariableView( modelItem: ModelElement, viewWriter: ViewDowncastWriter, dataDowncast = false ) {
 			const variableType = modelItem.getAttribute( 'data-variabletype' );
 			const variable = modelItem.getAttribute( 'data-variable' );
 			const label = modelItem.getAttribute( 'data-label' );
@@ -92,21 +82,17 @@ export default class CKEditorVariablesEditing extends Plugin {
 			const entrySlug = modelItem.getAttribute( 'data-entryslug' );
 			const entryTypeHandle = modelItem.getAttribute( 'data-entrytypehandle' );
 
-			const ckeditorVariableView = viewWriter.createContainerElement(
-				dataDowncast ? 'span' : 'code',
-				{
-					class: 'ckeditor-variable',
-					'data-variabletype': variableType,
-					'data-variable': variable,
-					'data-label': label,
-					'data-globalset': globalSet,
-					'data-entrysection': entrySection,
-					'data-entryslug': entrySlug,
-					'data-entrytypehandle': entryTypeHandle
-				}
-			);
+			const ckeditorVariableView = viewWriter.createContainerElement( dataDowncast ? 'span' : 'code', {
+				class: 'ckeditor-variable',
+				'data-variabletype': variableType,
+				'data-variable': variable,
+				'data-label': label,
+				'data-globalset': globalSet,
+				'data-entrysection': entrySection,
+				'data-entryslug': entrySlug,
+				'data-entrytypehandle': entryTypeHandle
+			} );
 
-			// eslint-disable-next-line no-nested-ternary
 			const text = dataDowncast ?
 				variableType === 'globals' ?
 					`{globalset:${ globalSet }:${ variable }}` :
