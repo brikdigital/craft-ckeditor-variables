@@ -2,6 +2,7 @@
 
 namespace brikdigital\craftckeditorvariables;
 
+use brikdigital\craftckeditorvariables\events\ReplaceEntryTypePlaceholder;
 use brikdigital\craftckeditorvariables\models\Settings;
 use brikdigital\craftckeditorvariables\web\assets\ckeditorvariables\CKEditorVariablesAsset;
 use Craft;
@@ -31,6 +32,8 @@ use yii\base\Event;
  */
 class CKEditorVariables extends Plugin
 {
+    public const EVENT_REPLACE_ENTRY_TYPE_PLACEHOLDER = 'replaceEntryTypePlaceholder';
+
     private array $supportedFieldTypes = [PlainText::class];
 
     public bool $hasCpSettings = true;
@@ -67,16 +70,24 @@ class CKEditorVariables extends Plugin
             View::class,
             View::EVENT_AFTER_RENDER_TEMPLATE,
             function (TemplateEvent $event) {
-                if (Craft::$app->request->isCpRequest) return;
+                if (Craft::$app->request->isCpRequest
+                    || empty($event->variables['entry'])
+                ) {
+                    return;
+                }
+
                 /** @var Entry $entry */
-                if (empty($event->variables['entry'])) return;
                 $entry = $event->variables['entry'];
 
                 $event->output = preg_replace_callback("/\[\[(?<type>\w+) \^_\^ (?<field>\w+)]]/", function ($matches) use ($entry) {
-                    if ($entry->type->handle !== $matches['type']) return '';
-                    return $matches['field'] === 'title'
-                        ? $entry->title
-                        : $entry->getFieldValue($matches['field']);
+                    $event = new ReplaceEntryTypePlaceholder([
+                        'entryTypeHandle' => $matches['type'] ?? null,
+                        'fieldHandle' => $matches['field'] ?? null,
+                    ]);
+                    $event->sender = $entry;
+                    $this->trigger(self::EVENT_REPLACE_ENTRY_TYPE_PLACEHOLDER, $event);
+
+                    return $event->getReplacement();
                 }, $event->output);
             }
         );
