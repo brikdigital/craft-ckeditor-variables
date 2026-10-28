@@ -99,7 +99,7 @@ class CKEditorVariables extends Plugin
                 if (in_array($field::class, $this->supportedFieldTypes)) {
                     $fields[] = [
                         'handle' => $field->getHandle(),
-                        'name' => $field->name,
+                        'name' => $this->translate($field->name),
                         'value' => $globalSet->getFieldValue($field->getHandle()),
                     ];
                 }
@@ -108,14 +108,14 @@ class CKEditorVariables extends Plugin
             foreach ($layout->getGeneratedFields() as $field) {
                 $fields[] = [
                     'handle' => $field['handle'],
-                    'name' => $field['name'],
+                    'name' => $this->translate($field['name']),
                     'value' => $generatedValues[$field['handle']] ?? '<empty>',
                 ];
             }
 
             $globals[] = [
                 'handle' => $globalSet->handle,
-                'name' => $globalSet->name,
+                'name' => $this->translate($globalSet->name),
                 'fields' => $fields
             ];
         }
@@ -164,7 +164,11 @@ class CKEditorVariables extends Plugin
 
             $layout = $entryType->getFieldLayout();
             if ($layout !== null) {
-                $entryTypeFields[$entryType->handle] = collect($this->collectLayoutFields($layout));
+                $entryTypeFields[] = [
+                    'handle' => $entryType->handle,
+                    'name' => $this->translate($entryType->name),
+                    'fields' => collect($this->collectLayoutFields($layout)),
+                ];
             }
         }
 
@@ -186,14 +190,14 @@ class CKEditorVariables extends Plugin
 
         $layoutFields[] = [
             'handle' => 'title',
-            'name' => 'Titel',
+            'name' => $this->translate('Title', 'app'),
         ];
 
         /** @var TextField|PlainText|CKEditorField $field */
         foreach ($fields as $i => $field) {
             $layoutFields[] = [
                 'handle' => $field->handle,
-                'name' => $field->name,
+                'name' => $this->translate($field->name),
             ];
         }
 
@@ -210,7 +214,7 @@ class CKEditorVariables extends Plugin
         $globals = [];
         foreach (Craft::$app->getGlobals()->getAllSets() as $globalSet) {
             $globals[] = [
-                'label' => $globalSet->name,
+                'label' => $this->translate($globalSet->name),
                 'value' => $globalSet->handle,
             ];
         }
@@ -218,7 +222,7 @@ class CKEditorVariables extends Plugin
         $entryTypes = [];
         foreach (Craft::$app->entries->getAllEntryTypes() as $entryType) {
             $entryTypes[] = [
-                'label' => $entryType->name,
+                'label' => $this->translate($entryType->name),
                 'value' => $entryType->handle,
             ];
         }
@@ -231,5 +235,10 @@ class CKEditorVariables extends Plugin
                 'settings' => $this->getSettings(),
             ]
         );
+    }
+
+    private function translate(string $value, string $category = 'site'): string
+    {
+        return Craft::t($category, $value);
     }
 }

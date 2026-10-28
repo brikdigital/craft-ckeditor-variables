@@ -56,10 +56,10 @@ function c() {
 	return r.length && e.push({
 		id: "entryTypes",
 		menu: "Entry types",
-		children: Object.entries(r).map(([e, t]) => ({
-			id: `entryTypes_${e}`,
-			menu: e,
-			children: t.map((e) => ({
+		children: r.map((e) => ({
+			id: `entryTypes_${e.handle}`,
+			menu: e.name,
+			children: e.fields.map((e) => ({
 				id: e.handle,
 				label: e.name
 			}))

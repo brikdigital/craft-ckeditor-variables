@@ -22,9 +22,13 @@ declare global {
 			entrySection: string;
 		}>;
 
-		availableEntryTypeFields: Record<string, Array<{
-			name: string;
+		availableEntryTypeFields: Array<{
 			handle: string;
-		}>>;
+			name: string;
+			fields: Array<{
+				name: string;
+				handle: string;
+			}>;
+		}>;
 	}
 }

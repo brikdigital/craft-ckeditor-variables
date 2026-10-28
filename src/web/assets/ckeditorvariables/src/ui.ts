@@ -110,19 +110,19 @@ function getMenuDefinition() {
 	}
 
 	const entryTypeFields = window.availableEntryTypeFields ?? [];
-	if ( entryTypeFields.length ) {
-		definition.push( {
+	if (entryTypeFields.length) {
+		definition.push({
 			id: 'entryTypes',
 			menu: 'Entry types',
-			children: Object.entries( entryTypeFields ).map( ( [ name, fields ] ) => ( {
-				id: `entryTypes_${ name }`,
-				menu: name,
-				children: fields.map( f => ( {
-					id: f.handle,
-					label: f.name
-				} ) )
-			} ) )
-		} );
+			children: entryTypeFields.map((entryType) => ({
+				id: `entryTypes_${entryType.handle}`,
+				menu: entryType.name,
+				children: entryType.fields.map((field) => ({
+					id: field.handle,
+					label: field.name,
+				})),
+			})),
+		});
 	}
 
 	return definition;
