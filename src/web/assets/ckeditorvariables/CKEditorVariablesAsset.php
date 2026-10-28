@@ -17,4 +17,8 @@ class CKEditorVariablesAsset extends BaseCkeditorPackageAsset
 	public array $pluginNames = [
 		'Variables',
 	];
+
+	public array $toolbarItems = [
+		'ckeditorVariables'
+	];
 }
